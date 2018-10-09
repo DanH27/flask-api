@@ -15,7 +15,7 @@ conn = mysql.connect()
 cursor = conn.cursor()
 
 
-@app.route("/books")
+@app.route("/books", methods=['GET'])
 def getAllBooks():
     query = cursor.execute("SELECT * FROM books")
     #head_rows = cursor.fetchmany(size=2)
@@ -33,17 +33,24 @@ def getOneBook(id):
 
     return allBooks
 
-
-    #query = cursor.execute("SELECT * FROM books")
-    #head_rows = cursor.fetchmany(size=2)
-    #return "Hello World!" + str(query)
-    #return jsonify(myArray)
-    #return jsonify(bookFound)
 @app.route('/books/<id>', methods=['DELETE'])
 def deleteBook(id):
     bookID = id
     query = cursor.execute("DELETE FROM books WHERE id=" + bookID)
     #Create an return message if delete was sucessfull
+
+@app.route('/books/<title>/<author>', methods=['POST'])
+def addNewBook(title, author):
+    sql = "INSERT INTO books VALUES (NULL, %s, %s)"
+    val = (str(title), str(author))
+    cursor.execute(sql, val)
+
+@app.route('/books/<id>/<title>/<author>', methods=['PUT'])
+def modifyBook(id, title, author):
+    sql = 'UPDATE books SET title = %s, author = %s WHERE id=%s'
+    val = (str(title), str(author), int(id))
+    cursor.execute(sql, val)
+
 
 if __name__ == "__main__":
     app.run()
